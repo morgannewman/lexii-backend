@@ -1,0 +1,11 @@
+language: python
+install:
+  - pip install -r requirements.txt
+# command to run tests
+script:
+  - echo "What tests?! This is a hackathon!"
+deploy:
+  provider: heroku
+  api_key:
+    secure: "Olo4UQZ/SUkRMJTDkAsadILurT9SGCQCIhZfLv+2fgp5GYPxl1HqMEf1NUxbKUl3csubqGoIxA19vcPLvJgR7XF/H+vKrNPyJyHLviOUREfCQ+VsdP29eIBYhwvCSt/zeDWT8z/lAgZxfz9r2BV6vbb5k6RUNCr+1RMBFi89RS+raUHdcBV0lsRHxtUjkzkkJ00o6bSAxZlF5S9p3GMzoMDdv6u0rSoPU+QLY9xYBThcqsvkGygz04l5PBTgviA6uxiRThSKW7rfkh0gTvN9fFvA87U+mWew+vgMCXARYxXKv/8dYbQ9Dv0aWodYE/tqUUU9j2kejj5w0P+Q1DZKnLh3WZLq8RRbMdLT9QnX6EiGedg07W6dj1tUtfbrySvq6IGGfaUiVVeZWDHN5iUe3GsYljjGV8ettj2S8brrQzbHd2DVPT7d0EvPvRiEHa+dikDlGRi0mPSQLTD3AbnLaIPeNT79Vw7FR7eC8zWNu8qfC1vJwKESzFAyvykDwwekdWWPOb6/BBqwtN5MrPNUm2K3ssYwhPQ7/DPYGuuXuSfqi3DiNNsmOQGFV/eeERUIcWjE3Tb9+beKR5arnRSiWeC1usDgwD1UljS3NH0mQBAFvD3GfCCo2z+lHLq3Z0veMB3OFRrPFt4cNOQe9lN2mQnwGxixBfgZ2re1jjlOmSU="
+  app: lexii-backend
