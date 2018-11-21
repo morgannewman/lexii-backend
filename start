@@ -1,2 +1,2 @@
 # spin up dev environment with `. start`
-. venv/bin/activate && export APP_SETTINGS=config.DevelopmentConfig && python3 project/app.py
+. venv/bin/activate && export FLASK_APP=server.py && export FLASK_ENV=development && flask run
