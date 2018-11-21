@@ -1,2 +1,2 @@
 # spin up dev environment with `. start`
-. venv/bin/activate && export APP_SETTINGS=config.DevelopmentConfig && python3 app.py
+. venv/bin/activate && export APP_SETTINGS=config.DevelopmentConfig && python3 project/app.py

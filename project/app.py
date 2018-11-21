@@ -4,12 +4,17 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask_cors import CORS
-# from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 # Init app
 app = Flask(__name__)
 # Default to production environment for security
 app.config.from_object(os.getenv("APP_SETTINGS") or "config.ProductionConfig")
+# Init db
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+from models import *
 
 # Set CORS permissions
 CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
