@@ -10,6 +10,6 @@ deploy:
   provider: heroku
   api_key:
     secure: "G80ywpphjsbnriSSDqUjnh76u85VNvjCRIlFdDParvJsJw6/9dmRumaQLrwaEaRAmJaTgvEGcs8evkrw+NCEZm/64QaO2gZUUZ77hzGpfEPBmDqbDSiFFBnOuWESbqkHGwyn4nr2NNiLO2L1vujt1ur8wDnromUI2Q8uBM7fdiB6HDeZsgWGBM2WmtAlU5r7j3Rkg+q48sGGVq3ir0ysu1E+ByZLpe61Nm9mgTQQ8nzJXdOzUf0UppVK17OhZ49zHvp//oojcbaD2PSfJCmKPirex/yMEFOBx5damT6LBVsb5KabX0MPXhoPnyJzChbbvPGyVTjqS8sOvdzwCfJ0Se+w9Dv5brWBXyDAWNigZjbrmHYle7S/9AMdN35W8VQjYQFpikx6AehZWmKcy9IrE98sHoKyGr1SRb3Vqd+N7jkY0TMOuixlguVOkYKLBDLQbO37fLnmAYzRxT8jCCsOTDrqDI7HGCIeR18byh8Xxgj48S85OJvYiQ8TdJ+xPfDeRWvJXOXzNcXhnTkOQ0GIvJ3SVXyXh2eGtb0nkDV7JQtn9EOa8tTRDTc0gnIfhEyHteziIvf+5GObFksN7VAtl+if2C7kD6IabWnLYHDlO9dcLylcwE+9I4tYq1P0OF7Pm8KxYrueyEnc2Em/McnA9P0UyN6b+mUdiYHcOpcdYH8="
-    app:
-      master: lexii-backend-staging
-      production: lexii-backend
+  app:
+    master: lexii-backend-staging
+    production: lexii-backend
