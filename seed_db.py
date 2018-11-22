@@ -1,3 +1,4 @@
+import bcrypt
 from datetime import datetime
 from server import db
 from server.models import Users, Snippets
@@ -14,21 +15,24 @@ db.create_tables([Users, Snippets])
 # Users 2 - Snippetss with even IDs
 
 
-u1 = {
-    "email": "test1@test.com",
-    "password": "password",
-    "first_name": "Morgan",
-    "last_name": "Freeman",
-}
+u1 = Users(
+    email="test1@test.com",
+    password="password",
+    first_name="Morgan",
+    last_name="Freeman",
+)
 
-u2 = {
-    "email": "test2@test.com",
-    "password": "password",
-    "first_name": "Morgan",
-    "last_name": "NotFreeman",
-}
+u2 = Users(
+    email="test2@test.com",
+    password=bcrypt.hashpw("password".encode("utf-8"), bcrypt.gensalt()),
+    first_name="Morgan",
+    last_name="NotFreeman",
+)
 
-Users.insert_many([u1, u2]).execute()
+u1.save()
+u2.save()
+
+# Users.insert_many([u1, u2]).execute()
 
 
 s1 = {

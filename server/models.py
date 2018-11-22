@@ -11,12 +11,6 @@ class Users(db.Model):
     first_name = CharField(max_length=32)
     last_name = CharField(max_length=32)
 
-    def __init__(self, first_name, last_name, email, password):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.password = password
-
 
 class Snippets(db.Model):
     user = ForeignKeyField(Users, backref="snippets")
