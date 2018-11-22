@@ -1,41 +1,41 @@
 from datetime import datetime
 from server import db
-from server.models import User, Snippet
-import json
+from server.models import Users, Snippets
+
+MODELS = [Users, Snippets]
+db.bind(MODELS, bind_refs=False, bind_backrefs=False)
+db.connect()
+
+db.drop_tables(MODELS)
+db.create_tables([Users, Snippets])
 
 
-db.drop_all()
-db.create_all()
+# Users 1 - Snippetss with odd IDs
+# Users 2 - Snippetss with even IDs
 
 
-# User 1 - Snippets with odd IDs
-# User 2 - Snippets with even IDs
+u1 = {
+    "email": "test1@test.com",
+    "password": "password",
+    "first_name": "Morgan",
+    "last_name": "Freeman",
+}
+
+u2 = {
+    "email": "test2@test.com",
+    "password": "password",
+    "first_name": "Morgan",
+    "last_name": "NotFreeman",
+}
+
+Users.insert_many([u1, u2]).execute()
 
 
-u1 = User(
-    email="test1@test.com",
-    password="password",
-    first_name="Morgan",
-    last_name="Freeman",
-)
-u2 = User(
-    email="test2@test.com",
-    password="password",
-    first_name="Morgan",
-    last_name="Freeman",
-)
-
-db.session.bulk_save_objects([u1, u2])
-db.session.commit()
-
-u1 = User.query.get(1)
-u2 = User.query.get(2)
-
-s1 = Snippet(
-    user=u1,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s1 = {
+    "user": 1,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -43,13 +43,13 @@ s1 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-s2 = Snippet(
-    user=u2,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s2 = {
+    "user": 2,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -57,13 +57,13 @@ s2 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-s3 = Snippet(
-    user=u1,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s3 = {
+    "user": 1,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -71,13 +71,13 @@ s3 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-s4 = Snippet(
-    user=u2,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s4 = {
+    "user": 2,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -85,13 +85,13 @@ s4 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-s5 = Snippet(
-    user=u1,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s5 = {
+    "user": 1,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -99,13 +99,13 @@ s5 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-s6 = Snippet(
-    user=u2,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s6 = {
+    "user": 2,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -113,13 +113,13 @@ s6 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-s7 = Snippet(
-    user=u1,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s7 = {
+    "user": 1,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -127,13 +127,13 @@ s7 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-s8 = Snippet(
-    user=u2,
-    title="This is a junk title",
-    content="lorem lorem lorem lorem",
-    keywords=[
+s8 = {
+    "user": 2,
+    "title": "This is a junk title",
+    "content": "lorem lorem lorem lorem",
+    "keywords": [
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
@@ -141,14 +141,8 @@ s8 = Snippet(
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
         {"createdAt": str(datetime.utcnow()), "keyword": "test"},
     ],
-)
+}
 
-db.session.add(s1)
-db.session.add(s2)
-db.session.add(s3)
-db.session.add(s4)
-db.session.add(s5)
-db.session.add(s6)
-db.session.add(s7)
-db.session.add(s8)
-db.session.commit()
+Snippets.insert_many([s1, s2, s3, s4, s5, s6, s7, s8]).execute()
+
+db.close()
