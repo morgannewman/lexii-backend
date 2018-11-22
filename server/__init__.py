@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Default to production environment for security
 app.config.from_object(Config)
 # Init db
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
