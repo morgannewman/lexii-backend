@@ -52,9 +52,9 @@ def _db_connect():
 # This hook ensures that the connection is closed when we've finished
 # processing the request.
 @app.teardown_request
-def _db_close():
+def _db_close(exp):
     if not db.is_closed():
         db.close()
 
 
-from server import routes
+import server.routes
