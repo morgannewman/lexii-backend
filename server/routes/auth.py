@@ -3,9 +3,11 @@ from flask import request, jsonify
 from peewee import IntegrityError
 from server.models import Users
 import bcrypt
+from server.helpers import required_fields
 
 
 @app.route("/auth/register", methods=["POST"])
+@required_fields(["email", "password", "first_name", "last_name"])
 def register_user():
     """
     EXPECT:
@@ -16,13 +18,6 @@ def register_user():
     -
     DB password to be hashed
     """
-    # Validate required fields
-    required_fields = ("email", "password", "first_name", "last_name")
-    for field in required_fields:
-        if field not in request.body:
-            err = jsonify({"message": "missing `{}` in request body".format(field)})
-            err.status = "400"
-            return err
     # TODO: add any additional verification checks (e.g. password length, email format)
     # insert into db
     try:
@@ -44,6 +39,7 @@ def register_user():
 
 
 @app.route("/auth/login", methods=["POST"])
+@required_fields(["email", "password"])
 def login():
     """
     EXPECT:
@@ -53,13 +49,6 @@ def login():
     req password to match the user's password (403)
     res to issue a new token (200)
     """
-    # EXPECT email / password
-    required_fields = ("email", "password")
-    for field in required_fields:
-        if field not in request.body:
-            err = jsonify({"message": "missing `{}` in request body".format(field)})
-            err.status = "400"
-            return err
     # TODO: validate inputs before DB
     # find user
     user = Users.get(Users.email == request.body["email"])
@@ -85,6 +74,7 @@ def login():
 
 
 @app.route("/auth/refresh", methods=["POST"])
+@required_fields(["token"])
 def refresh_token():
     """
     EXPECT:
@@ -92,10 +82,6 @@ def refresh_token():
     req to contain a valid token (400)
     res to issue a new token (200)
     """
-    if "token" not in request.body:
-        err = jsonify({"message": "missing `token` in request body"})
-        err.status = "400"
-        return err
     # issue new token
     try:
         return jsonify(
