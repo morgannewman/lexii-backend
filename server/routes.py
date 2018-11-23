@@ -2,6 +2,7 @@ from server import app, db
 from flask import request, json, jsonify, abort
 from functools import wraps
 from peewee import IntegrityError
+from playhouse.flask_utils import get_object_or_404
 from server import db
 from server.models import Users
 import bcrypt
@@ -12,7 +13,15 @@ import bcrypt
 def index():
     return "Hello, World!"
 
-
+"""
+EXPECT:
+req to have all required fields (400)
+TODO: req to have the correctly-formed params (400) => before DB
+req email to be unique (403)
+req to create a new user in DB (201)
+-
+DB password to be hashed
+"""
 @app.route("/auth/register", methods=["POST"])
 def register():
     req = request.get_json()
@@ -41,3 +50,37 @@ def register():
         return ("email already exists", 403)
     except AttributeError:
         return ("Invalid request values", 400)
+
+
+"""
+EXPECT:
+req to have all required fields (400)
+TODO: req to have the correctly-formed params (400) => before DB
+req email to be unique (403)
+req email to exist (404)
+req password to match the user's password (404)
+res to return a JWT
+"""
+@app.route("/auth/login", methods=["POST"])
+def login():
+    req = request.get_json()
+    # EXPECT email / password
+    required_fields = ("email", "password")
+    for field in required_fields:
+        if field not in req:
+            err = jsonify({"message": "missing `{}` in request body".format(field)})
+            err.status = "400"
+            return err
+
+    # find user
+    try:
+        user = Users.get(Users.email == req["email"])
+        # validate password
+        if bcrypt.checkpw(
+            req["password"].encode("utf-8"), user.password.encode("utf-8")
+        ):
+            # issue token
+            return "success"
+        return ("Email or password not found", 404)
+    except:
+        return ("Email or password not found", 404)
