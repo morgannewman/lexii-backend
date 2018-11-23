@@ -13,6 +13,7 @@ import bcrypt
 def index():
     return "Hello, World!"
 
+
 """
 EXPECT:
 req to have all required fields (400)
@@ -22,6 +23,8 @@ req to create a new user in DB (201)
 -
 DB password to be hashed
 """
+
+
 @app.route("/auth/register", methods=["POST"])
 def register():
     req = request.get_json()
@@ -61,6 +64,8 @@ req email to exist (404)
 req password to match the user's password (404)
 res to return a JWT
 """
+
+
 @app.route("/auth/login", methods=["POST"])
 def login():
     req = request.get_json()
@@ -73,14 +78,12 @@ def login():
             return err
 
     # find user
-    try:
-        user = Users.get(Users.email == req["email"])
-        # validate password
-        if bcrypt.checkpw(
-            req["password"].encode("utf-8"), user.password.encode("utf-8")
-        ):
-            # issue token
-            return "success"
-        return ("Email or password not found", 404)
-    except:
+    user = Users.get(Users.email == req["email"])
+    # validate password
+    if bcrypt.checkpw(req["password"].encode("utf-8"), user.password.encode("utf-8")):
+        # issue token
+        token = Users.encode_auth_token(user.id)
+        print("TOKEN ISSUED:", token)
+        return jsonify({"token": str(token)})
+    else:
         return ("Email or password not found", 404)

@@ -17,7 +17,7 @@ db.create_tables([Users, Snippets])
 
 u1 = Users(
     email="test1@test.com",
-    password="password",
+    password=bcrypt.hashpw("password".encode("utf-8"), bcrypt.gensalt()),
     first_name="Morgan",
     last_name="Freeman",
 )
