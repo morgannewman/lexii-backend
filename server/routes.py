@@ -5,6 +5,7 @@ from peewee import IntegrityError
 from playhouse.flask_utils import get_object_or_404
 from server import db
 from server.models import Users
+import jwt
 import bcrypt
 
 
@@ -87,3 +88,25 @@ def login():
         return jsonify({"token": str(token)})
     else:
         return ("Email or password not found", 404)
+
+
+@app.route("/auth/refresh", methods=["POST"])
+def refresh():
+    req = request.get_json()
+    if "token" not in req:
+        res = jsonify({"message": "missing `token` in request body"})
+        res.status = "400"
+        return res
+    # issue new token
+    try:
+        return jsonify(
+            {
+                "token": str(
+                    Users.encode_auth_token(Users.decode_auth_token(req["token"]))
+                )
+            }
+        )
+    except:
+        res = jsonify({"message": "Invalid token"})
+        res.status = "400"
+        return res

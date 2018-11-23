@@ -28,10 +28,27 @@ class Users(db.Model):
                 "iat": datetime.datetime.utcnow(),
                 "sub": user_id,
             }
-            return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            return jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("utf-8")
         except Exception as e:
             print("Failed to encode token", e)
             return e
+
+    @staticmethod
+    def decode_auth_token(auth_token):
+        """
+        Validates the auth token
+        :param auth_token:
+        :return: integer|string
+        """
+        print(auth_token)
+        payload = jwt.decode(auth_token, SECRET_KEY)
+        """
+        is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
+        if is_blacklisted_token:
+            return 'Token blacklisted. Please log in again.'
+        else:
+        """
+        return payload["sub"]
 
 
 class Snippets(db.Model):
