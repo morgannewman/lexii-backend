@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from functools import wraps
+import datetime
 import re
 
 
@@ -35,3 +36,11 @@ def ensure_email_is_valid(fn):
             return err
 
     return wrapper
+
+
+def generate_utcnow():
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
+def generate_utcnow_str():
+    return str(datetime.datetime.now(datetime.timezone.utc))

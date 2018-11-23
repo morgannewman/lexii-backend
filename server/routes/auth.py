@@ -55,20 +55,15 @@ def login_user():
     try:
         # find user
         user = Users.get(Users.email == request.body["email"])
-        user_object = {
-            "id": user.id,
-            "registered_on": user.registered_on,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-        }
+        print(user.to_dict())
+        user_object = user.to_dict()
         # validate password
         if bcrypt.checkpw(
             request.body["password"].encode("utf-8"), user.password.encode("utf-8")
         ):
             # issue token
             token = Users.encode_auth_token(user_object)
-            return jsonify({"token": str(token)})
+            return jsonify({"token": str(token), "user": user_object})
         else:
             raise AttributeError
     except (Users.DoesNotExist, AttributeError):
