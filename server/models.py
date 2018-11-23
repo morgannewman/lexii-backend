@@ -21,17 +21,13 @@ class Users(db.Model):
         Generates the Auth Token
         :return: string
         """
-        try:
-            payload = {
-                "exp": datetime.datetime.utcnow()
-                + datetime.timedelta(days=7, seconds=0),
-                "iat": datetime.datetime.utcnow(),
-                "sub": user_id,
-            }
-            return jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("utf-8")
-        except Exception as e:
-            print("Failed to encode token", e)
-            return e
+        payload = {
+            # 7 day life
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=7, seconds=0),
+            "iat": datetime.datetime.utcnow(),
+            "sub": user_id,
+        }
+        return jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("utf-8")
 
     @staticmethod
     def decode_auth_token(auth_token):

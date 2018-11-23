@@ -1,11 +1,7 @@
 from server import app, db
-from flask import request, json, jsonify, abort
-from functools import wraps
+from flask import request, jsonify
 from peewee import IntegrityError
-from playhouse.flask_utils import get_object_or_404
-from server import db
 from server.models import Users
-import jwt
 import bcrypt
 
 
@@ -15,19 +11,17 @@ def index():
     return "Hello, World!"
 
 
-"""
-EXPECT:
-req to have all required fields (400)
-TODO: req to have the correctly-formed params (400) => before DB
-req email to be unique (403)
-req to create a new user in DB (201)
--
-DB password to be hashed
-"""
-
-
 @app.route("/auth/register", methods=["POST"])
 def register():
+    """
+    EXPECT:
+    req to have all required fields (400)
+    TODO: req to have the correctly-formed params (400) => before DB
+    req email to be unique (403)
+    req to create a new user in DB (201)
+    -
+    DB password to be hashed
+    """
     req = request.get_json()
     # Validate required fields
     required_fields = ("email", "password", "first_name", "last_name")
@@ -56,19 +50,17 @@ def register():
         return ("Invalid request values", 400)
 
 
-"""
-EXPECT:
-req to have all required fields (400)
-TODO: req to have the correctly-formed params (400) => before DB
-req email to be unique (403)
-req email to exist (404)
-req password to match the user's password (404)
-res to return a JWT
-"""
-
-
 @app.route("/auth/login", methods=["POST"])
 def login():
+    """
+    EXPECT:
+    req to have all required fields (400)
+    TODO: req to have the correctly-formed params (400) => before DB
+    req email to be unique (403)
+    req email to exist (404)
+    req password to match the user's password (404)
+    res to issue a new token (200)
+    """
     req = request.get_json()
     # EXPECT email / password
     required_fields = ("email", "password")
@@ -81,17 +73,29 @@ def login():
     # find user
     user = Users.get(Users.email == req["email"])
     # validate password
-    if bcrypt.checkpw(req["password"].encode("utf-8"), user.password.encode("utf-8")):
-        # issue token
-        token = Users.encode_auth_token(user.id)
-        print("TOKEN ISSUED:", token)
-        return jsonify({"token": str(token)})
-    else:
-        return ("Email or password not found", 404)
+    try:
+        if bcrypt.checkpw(
+            req["password"].encode("utf-8"), user.password.encode("utf-8")
+        ):
+            # issue token
+            token = Users.encode_auth_token(user.id)
+            print("TOKEN ISSUED:", token)
+            return jsonify({"token": str(token)})
+        else:
+            return ("Incorrect email or password", 404)
+    # TODO: Handle malformed requests more idiomatically
+    except:
+        return ("Incorrect email or password", 404)
 
 
 @app.route("/auth/refresh", methods=["POST"])
 def refresh():
+    """
+    EXPECT:
+    req to have all required fields (400)
+    req to contain a valid token (400)
+    res to issue a new token (200)
+    """
     req = request.get_json()
     if "token" not in req:
         res = jsonify({"message": "missing `token` in request body"})
@@ -106,6 +110,7 @@ def refresh():
                 )
             }
         )
+    # TODO: Handle malformed tokens idiomatically
     except:
         res = jsonify({"message": "Invalid token"})
         res.status = "400"
