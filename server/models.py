@@ -36,7 +36,6 @@ class Users(db.Model):
         :param auth_token:
         :return: integer|string
         """
-        print(auth_token)
         payload = jwt.decode(auth_token, SECRET_KEY)
         """
         is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)

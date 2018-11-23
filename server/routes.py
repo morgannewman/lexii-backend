@@ -79,7 +79,6 @@ def login():
         ):
             # issue token
             token = Users.encode_auth_token(user.id)
-            print("TOKEN ISSUED:", token)
             return jsonify({"token": str(token)})
         else:
             return ("Incorrect email or password", 404)
