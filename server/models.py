@@ -1,5 +1,6 @@
 import datetime
 from peewee import DateTimeField, CharField, ForeignKeyField, TextField
+from flask import json
 from playhouse.postgres_ext import BinaryJSONField
 from server import db_wrapper as db
 from server.config import Config
@@ -16,7 +17,7 @@ class Users(db.Model):
     last_name = CharField(max_length=32)
 
     @staticmethod
-    def encode_auth_token(user_id):
+    def encode_auth_token(user):
         """
         Generates the Auth Token
         :return: string
@@ -25,7 +26,7 @@ class Users(db.Model):
             # 7 day life
             "exp": datetime.datetime.utcnow() + datetime.timedelta(days=7, seconds=0),
             "iat": datetime.datetime.utcnow(),
-            "sub": user_id,
+            "sub": json.dumps(user),
         }
         return jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("utf-8")
 
@@ -43,7 +44,7 @@ class Users(db.Model):
             return 'Token blacklisted. Please log in again.'
         else:
         """
-        return payload["sub"]
+        return json.loads(payload["sub"])
 
 
 class Snippets(db.Model):

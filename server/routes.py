@@ -56,9 +56,8 @@ def login():
     EXPECT:
     req to have all required fields (400)
     TODO: req to have the correctly-formed params (400) => before DB
-    req email to be unique (403)
-    req email to exist (404)
-    req password to match the user's password (404)
+    req email to exist (403)
+    req password to match the user's password (403)
     res to issue a new token (200)
     """
     req = request.get_json()
@@ -69,22 +68,29 @@ def login():
             err = jsonify({"message": "missing `{}` in request body".format(field)})
             err.status = "400"
             return err
-
+    # TODO: validate inputs before DB
     # find user
     user = Users.get(Users.email == req["email"])
-    # validate password
+    user_object = {
+        "id": user.id,
+        "registered_on": user.registered_on,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+    }
     try:
+        # validate password
         if bcrypt.checkpw(
             req["password"].encode("utf-8"), user.password.encode("utf-8")
         ):
             # issue token
-            token = Users.encode_auth_token(user.id)
+            token = Users.encode_auth_token(user_object)
             return jsonify({"token": str(token)})
         else:
-            return ("Incorrect email or password", 404)
+            return ("Incorrect email or password", 403)
     # TODO: Handle malformed requests more idiomatically
     except:
-        return ("Incorrect email or password", 404)
+        return ("Incorrect email or password", 403)
 
 
 @app.route("/auth/refresh", methods=["POST"])
