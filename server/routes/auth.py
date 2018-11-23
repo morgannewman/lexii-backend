@@ -5,14 +5,8 @@ from server.models import Users
 import bcrypt
 
 
-@app.route("/")
-@app.route("/index")
-def index():
-    return "Hello, World!"
-
-
 @app.route("/auth/register", methods=["POST"])
-def register():
+def register_user():
     """
     EXPECT:
     req to have all required fields (400)
@@ -22,11 +16,10 @@ def register():
     -
     DB password to be hashed
     """
-    req = request.get_json()
     # Validate required fields
     required_fields = ("email", "password", "first_name", "last_name")
     for field in required_fields:
-        if field not in req:
+        if field not in request.body:
             err = jsonify({"message": "missing `{}` in request body".format(field)})
             err.status = "400"
             return err
@@ -35,12 +28,12 @@ def register():
     try:
         with db.atomic():
             Users.create(
-                email=req["email"],
+                email=request.body["email"],
                 password=bcrypt.hashpw(
-                    req["password"].encode("utf-8"), bcrypt.gensalt()
+                    request.body["password"].encode("utf-8"), bcrypt.gensalt()
                 ),
-                first_name=req["first_name"],
-                last_name=req["last_name"],
+                first_name=request.body["first_name"],
+                last_name=request.body["last_name"],
             )
         return ("", 201)
 
@@ -60,17 +53,16 @@ def login():
     req password to match the user's password (403)
     res to issue a new token (200)
     """
-    req = request.get_json()
     # EXPECT email / password
     required_fields = ("email", "password")
     for field in required_fields:
-        if field not in req:
+        if field not in request.body:
             err = jsonify({"message": "missing `{}` in request body".format(field)})
             err.status = "400"
             return err
     # TODO: validate inputs before DB
     # find user
-    user = Users.get(Users.email == req["email"])
+    user = Users.get(Users.email == request.body["email"])
     user_object = {
         "id": user.id,
         "registered_on": user.registered_on,
@@ -81,42 +73,41 @@ def login():
     try:
         # validate password
         if bcrypt.checkpw(
-            req["password"].encode("utf-8"), user.password.encode("utf-8")
+            request.body["password"].encode("utf-8"), user.password.encode("utf-8")
         ):
             # issue token
             token = Users.encode_auth_token(user_object)
             return jsonify({"token": str(token)})
         else:
             return ("Incorrect email or password", 403)
-    # TODO: Handle malformed requests more idiomatically
-    except:
+    except Exception:
         return ("Incorrect email or password", 403)
 
 
 @app.route("/auth/refresh", methods=["POST"])
-def refresh():
+def refresh_token():
     """
     EXPECT:
     req to have all required fields (400)
     req to contain a valid token (400)
     res to issue a new token (200)
     """
-    req = request.get_json()
-    if "token" not in req:
-        res = jsonify({"message": "missing `token` in request body"})
-        res.status = "400"
-        return res
+    if "token" not in request.body:
+        err = jsonify({"message": "missing `token` in request body"})
+        err.status = "400"
+        return err
     # issue new token
     try:
         return jsonify(
             {
                 "token": str(
-                    Users.encode_auth_token(Users.decode_auth_token(req["token"]))
+                    Users.encode_auth_token(
+                        Users.decode_auth_token(request.body["token"])
+                    )
                 )
             }
         )
-    # TODO: Handle malformed tokens idiomatically
-    except:
-        res = jsonify({"message": "Invalid token"})
-        res.status = "400"
-        return res
+    except Exception:
+        err = jsonify({"message": "Invalid token"})
+        err.status = "400"
+        return err
