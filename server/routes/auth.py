@@ -3,11 +3,12 @@ from flask import request, jsonify
 from peewee import IntegrityError
 from server.models import Users
 import bcrypt
-from server.helpers import required_fields
+from server.helpers import required_fields, ensure_email_is_valid
 
 
 @app.route("/auth/register", methods=["POST"])
 @required_fields(["email", "password", "first_name", "last_name"])
+@ensure_email_is_valid
 def register_user():
     """
     EXPECT:
@@ -40,7 +41,8 @@ def register_user():
 
 @app.route("/auth/login", methods=["POST"])
 @required_fields(["email", "password"])
-def login():
+@ensure_email_is_valid
+def login_user():
     """
     EXPECT:
     req to have all required fields (400)
@@ -50,16 +52,16 @@ def login():
     res to issue a new token (200)
     """
     # TODO: validate inputs before DB
-    # find user
-    user = Users.get(Users.email == request.body["email"])
-    user_object = {
-        "id": user.id,
-        "registered_on": user.registered_on,
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-    }
     try:
+        # find user
+        user = Users.get(Users.email == request.body["email"])
+        user_object = {
+            "id": user.id,
+            "registered_on": user.registered_on,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
         # validate password
         if bcrypt.checkpw(
             request.body["password"].encode("utf-8"), user.password.encode("utf-8")
@@ -68,9 +70,11 @@ def login():
             token = Users.encode_auth_token(user_object)
             return jsonify({"token": str(token)})
         else:
-            return ("Incorrect email or password", 403)
-    except Exception:
-        return ("Incorrect email or password", 403)
+            raise AttributeError
+    except (Users.DoesNotExist, AttributeError):
+        err = jsonify({"message": "Incorrect email or password"})
+        err.status = "403"
+        return err
 
 
 @app.route("/auth/refresh", methods=["POST"])
