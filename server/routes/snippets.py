@@ -1,8 +1,9 @@
-from server import app, db
 from flask import request, jsonify
+from server import app, db
 from peewee import IntegrityError
 from server.models import Snippets
 from server.helpers import required_fields
+from server.keyword_engine import generate_keywords, store_keywords
 
 
 @app.route("/api/snippets", methods=["GET"])
@@ -11,7 +12,7 @@ def get_all_snippets():
     for snippet in (
         Snippets.select()
         .where(Snippets.user == request.user["id"])
-        .order_by(Snippets.updatedAt)
+        .order_by(Snippets.updated_at)
     ):
         result.append(snippet.to_dict())
     return jsonify(result)
@@ -32,12 +33,35 @@ def get_snippet_by_id(id):
         return err
 
 
+# @required_fields(["title", "content"])
 @app.route("/api/snippets", methods=["POST"])
 def create_new_snippet():
-    return jsonify({"POST": "test"})
+    title = request.body["title"]
+    content = request.body["content"]
+    # TODO: Async add snippet to DB + generate_keywords
+    # add to DB
+    try:
+        with db.atomic():
+            snippet = Snippets.create(title=title, content=content)
+            snippet = snippet.to_dict()
+    except (IntegrityError, AttributeError):
+        err = jsonify({"message": "Error adding snippet"})
+        err.status = "500"
+        return err
+    # generate keywords using Google API
+    raw_keywords = generate_keywords(title, content)
+    # TODO: Await the two calls above to complete
+    # with new snippet_id, create keyword resource for each keyword
+    final_keywords = store_keywords(snippet["id"], raw_keywords)
+    snippet["keywords"] = final_keywords
+    # respond with snippet + keywords
+    res = jsonify(snippet)
+    res.status = "201"
+    return res
 
 
 @app.route("/api/snippets/<int:id>", methods=["PUT"])
+@required_fields(["id"])
 def edit_snippet_by_id(id):
     return jsonify({"PUT": id})
 

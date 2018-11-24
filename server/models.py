@@ -60,11 +60,14 @@ class Snippets(db.Model):
     title = CharField(max_length=128)
     content = TextField()
     keywords = BinaryJSONField()
-    createdAt = DateTimeField(default=generate_utcnow_str)
-    updatedAt = DateTimeField(default=generate_utcnow_str)
+    created_at = DateTimeField(default=generate_utcnow_str)
+    updated_at = DateTimeField(default=generate_utcnow_str)
 
     def to_dict(self):
         result = model_to_dict(self, recurse=False)
-        result["createdAt"] = str(result["createdAt"]) + "+00:00"
-        result["updatedAt"] = str(result["updatedAt"]) + "+00:00"
+        result["created_at"] = str(result["created_at"]) + "+00:00"
+        result["updated_at"] = str(result["updated_at"]) + "+00:00"
         return result
+
+class Keywords(db.Model):
+    keyword = CharField(max_length=48)
