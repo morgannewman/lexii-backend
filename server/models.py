@@ -59,7 +59,6 @@ class Snippets(db.Model):
     user = ForeignKeyField(Users, backref="snippets", index=True)
     title = CharField(max_length=128)
     content = TextField()
-    keywords = BinaryJSONField()
     created_at = DateTimeField(default=generate_utcnow_str)
     updated_at = DateTimeField(default=generate_utcnow_str)
 
@@ -69,5 +68,23 @@ class Snippets(db.Model):
         result["updated_at"] = str(result["updated_at"]) + "+00:00"
         return result
 
+
 class Keywords(db.Model):
-    keyword = CharField(max_length=48)
+    keyword = CharField(max_length=48, unique=True)
+    images = BinaryJSONField()
+    images_meta = BinaryJSONField()
+    updated_at = DateTimeField(default=generate_utcnow_str)
+
+    def to_dict(self):
+        result = model_to_dict(self, recurse=False)
+        result["updated_at"] = str(result["updated_at"]) + "+00:00"
+        return result
+
+
+class Snippets_Keywords(db.Model):
+    snippet = ForeignKeyField(Snippets)
+    keyword = ForeignKeyField(Keywords)
+    favorite_images = BinaryJSONField(null=True)
+
+    # class Meta:
+    #     primary_key = CompositeKey("snippet", "keyword")
