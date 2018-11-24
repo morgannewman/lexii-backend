@@ -7,7 +7,6 @@ from server.helpers import required_fields
 
 @app.route("/api/snippets", methods=["GET"])
 def get_all_snippets():
-    print(request.user)
     result = []
     for snippet in (
         Snippets.select()
@@ -20,7 +19,17 @@ def get_all_snippets():
 
 @app.route("/api/snippets/<int:id>", methods=["GET"])
 def get_snippet_by_id(id):
-    return jsonify({"GET": id})
+    try:
+        snippet = (
+            Snippets.select()
+            .where(Snippets.user == request.user["id"], Snippets.id == id)
+            .get()
+        )
+        return jsonify(snippet.to_dict())
+    except Snippets.DoesNotExist:
+        err = jsonify({"message": "Snippet does not exist"})
+        err.status = "404"
+        return err
 
 
 @app.route("/api/snippets", methods=["POST"])
