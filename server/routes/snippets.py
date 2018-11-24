@@ -44,4 +44,16 @@ def edit_snippet_by_id(id):
 
 @app.route("/api/snippets/<int:id>", methods=["DELETE"])
 def delete_snippet_by_id(id):
-    return jsonify({"DELETE": id})
+    try:
+        num_deleted = (
+            Snippets.delete()
+            .where(Snippets.user == request.user["id"], Snippets.id == id)
+            .execute()
+        )
+        if num_deleted == 0:
+            raise Snippets.DoesNotExist
+        return ("", 204)
+    except Snippets.DoesNotExist:
+        err = jsonify({"message": "Snippet does not exist"})
+        err.status = "404"
+        return err
