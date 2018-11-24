@@ -55,7 +55,6 @@ def login_user():
     try:
         # find user
         user = Users.get(Users.email == request.body["email"])
-        print(user.to_dict())
         user_object = user.to_dict()
         # validate password
         if bcrypt.checkpw(

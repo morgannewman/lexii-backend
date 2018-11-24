@@ -7,7 +7,15 @@ from server.helpers import required_fields
 
 @app.route("/api/snippets", methods=["GET"])
 def get_all_snippets():
-    return jsonify({"GET": "test"})
+    print(request.user)
+    result = []
+    for snippet in (
+        Snippets.select()
+        .where(Snippets.user == request.user["id"])
+        .order_by(Snippets.updatedAt)
+    ):
+        result.append(snippet.to_dict())
+    return jsonify(result)
 
 
 @app.route("/api/snippets/<int:id>", methods=["GET"])

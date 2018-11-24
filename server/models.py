@@ -51,13 +51,12 @@ class Users(db.Model):
     def to_dict(self):
         result = model_to_dict(self)
         del result["password"]
-        del result["id"]
         result["registered_on"] = str(result["registered_on"]) + "+00:00"
         return result
 
 
 class Snippets(db.Model):
-    user = ForeignKeyField(Users, backref="snippets")
+    user = ForeignKeyField(Users, backref="snippets", index=True)
     title = CharField(max_length=128)
     content = TextField()
     keywords = BinaryJSONField()
