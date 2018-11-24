@@ -3,7 +3,8 @@ from server import app, db
 from peewee import IntegrityError
 from server.models import Snippets
 from server.helpers import required_fields
-from server.keyword_engine import generate_keywords, store_keywords
+
+# from server.keyword_engine import generate_keywords, store_keywords
 
 
 @app.route("/api/snippets", methods=["GET"])
@@ -50,7 +51,7 @@ def create_new_snippet():
         return err
     # generate keywords using Google API
     raw_keywords = generate_keywords(title, content)
-    # TODO: Await the two calls above to complete
+    # Await HERE
     # with new snippet_id, create keyword resource for each keyword
     final_keywords = store_keywords(snippet["id"], raw_keywords)
     snippet["keywords"] = final_keywords

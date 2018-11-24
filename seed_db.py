@@ -1,153 +1,45 @@
-import bcrypt
-from datetime import datetime
 from server import db
-from server.models import Users, Snippets
-from server.helpers import generate_utcnow_str
+from server.models import Users, Snippets, Snippets_Keywords, Keywords
+from seed_data import users, snippets, snippets_keywords, keywords
 
-MODELS = [Users, Snippets]
+MODELS = [Users, Snippets, Snippets_Keywords, Keywords]
 db.bind(MODELS, bind_refs=False, bind_backrefs=False)
 db.connect()
 
-db.drop_tables(MODELS)
-db.create_tables([Users, Snippets])
+db.drop_tables([Snippets_Keywords, Keywords, Users, Snippets])
+db.create_tables([Users, Snippets, Keywords, Snippets_Keywords])
 
 
-# Users 1 - Snippetss with odd IDs
-# Users 2 - Snippetss with even IDs
+# Users 1 - Snippets with odd IDs
+# Users 2 - Snippets with even IDs
+Users.insert_many(users).execute()
+
+Snippets.insert_many(snippets).execute()
+
+keywords = Keywords.insert_many(keywords).returning(Keywords).execute()
 
 
-u1 = Users(
-    email="test1@test.com",
-    password=bcrypt.hashpw("password".encode("utf-8"), bcrypt.gensalt()),
-    first_name="Morgan",
-    last_name="Freeman",
+# Maintaining many-to-many relationship b/w snippets/keywords
+snippets = (
+    Snippets_Keywords.insert_many(snippets_keywords)
+    .returning(Snippets_Keywords)
+    .execute()
 )
 
-u2 = Users(
-    email="test2@test.com",
-    password=bcrypt.hashpw("password".encode("utf-8"), bcrypt.gensalt()),
-    first_name="Morgan",
-    last_name="NotFreeman",
+snippet = Snippets.get(Snippets.id == 1).to_dict()
+
+keywords = (
+    Keywords.select()
+    .join(Snippets_Keywords, on=Keywords.id == Snippets_Keywords.keyword_id)
+    .where(Snippets_Keywords.snippet_id == 1)
 )
 
-u1.save()
-u2.save()
+keywords_list = []
+for word in keywords:
+    keywords_list.append(word.to_dict())
 
-# Users.insert_many([u1, u2]).execute()
+snippet["keywords"] = keywords_list
 
-
-s1 = {
-    "user": 1,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-s2 = {
-    "user": 2,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-s3 = {
-    "user": 1,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-s4 = {
-    "user": 2,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-s5 = {
-    "user": 1,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-s6 = {
-    "user": 2,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-s7 = {
-    "user": 1,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-s8 = {
-    "user": 2,
-    "title": "This is a junk title",
-    "content": "lorem lorem lorem lorem",
-    "keywords": [
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-        {"created_at": generate_utcnow_str(), "keyword": "test"},
-    ],
-}
-
-Snippets.insert_many([s1, s2, s3, s4, s5, s6, s7, s8]).execute()
+# print(snippet)
 
 db.close()

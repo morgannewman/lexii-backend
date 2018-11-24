@@ -44,3 +44,24 @@ def generate_utcnow():
 
 def generate_utcnow_str():
     return str(datetime.datetime.now(datetime.timezone.utc))
+
+
+def _hydrate_from_db_returning_statement(keys):
+    def hydrate(cursor):
+        # for insert_many statements
+        if type(cursor) == tuple:
+            return dict(zip(keys, cursor))
+        # for statements returning one time
+        else:
+            return dict(zip(keys, cursor[0]))
+
+    return hydrate
+
+
+hydrate_keyword = _hydrate_from_db_returning_statement(
+    ("id", "keyword", "images", "images_meta", "updated_at")
+)
+
+hydrate_snippets_keywords = _hydrate_from_db_returning_statement(
+    ("id", "snippet", "keyword", "favorite_images")
+)
