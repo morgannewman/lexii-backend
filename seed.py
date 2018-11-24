@@ -1,6 +1,6 @@
 from server import db
 from server.models import Users, Snippets, Snippets_Keywords, Keywords
-from seed_data import users, snippets, snippets_keywords, keywords
+from server.db_engine.seed_data import users, snippets, snippets_keywords, keywords
 
 MODELS = [Users, Snippets, Snippets_Keywords, Keywords]
 db.bind(MODELS, bind_refs=False, bind_backrefs=False)
@@ -40,6 +40,6 @@ for word in keywords:
 
 snippet["keywords"] = keywords_list
 
-# print(snippet)
+print(snippet)
 
 db.close()

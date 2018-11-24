@@ -51,6 +51,7 @@ class Users(db.Model):
     def to_dict(self):
         result = model_to_dict(self)
         del result["password"]
+        del result["user"]
         result["registered_on"] = str(result["registered_on"]) + "+00:00"
         return result
 
@@ -64,6 +65,7 @@ class Snippets(db.Model):
 
     def to_dict(self):
         result = model_to_dict(self, recurse=False)
+        del result["user"]
         result["created_at"] = str(result["created_at"]) + "+00:00"
         result["updated_at"] = str(result["updated_at"]) + "+00:00"
         return result
